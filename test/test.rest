@@ -1,0 +1,29 @@
+
+@baseURL = http://127.0.0.1:8000
+
+GET {{baseURL}}/health
+
+###
+POST {{baseURL}}/auth/register
+Content-Type: application/json
+
+{
+    "name": "Ayush Rai",
+    "email": "ayush@1234.com",
+    "password": "1234"
+}
+
+###
+POST {{baseURL}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "ayush@1234.com",
+    "password": "1234"
+}
+
+###
+
+GET {{baseURL}}/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJheXVzaEAxMjM0LmNvbSIsImlkIjoxLCJyb2xlIjoiRU1QTE9ZRUUiLCJleHAiOjE3ODQwMTU4NTd9.McpK6GfEx2qnfjZK2IhwOCwR-rYfwKJIEnJMc8LZVxM
+###
