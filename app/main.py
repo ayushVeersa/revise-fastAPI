@@ -1,12 +1,24 @@
 from fastapi import FastAPI
-from app.api.auth import router
+from fastapi.middleware.cors import CORSMiddleware
+from app.api.auth import router as auth_router
+from app.api.employee import router as employee_router
 
 app = FastAPI()
 
-app.include_router(router)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:4200",
+        "http://127.0.0.1:4200",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(auth_router)
+app.include_router(employee_router)
 
 @app.get("/health")
 def check_health():
     return {"health": "ok"}
-
-
