@@ -1,5 +1,6 @@
 
 @baseURL = http://127.0.0.1:8000
+@access_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJheXVzaEAxMjM0LmNvbSIsImV4cCI6MTc4NDAyNzY5OX0.YZ4q4cStCdwLiDWT5HxF1hDNHfXxHsgahg3wL1_Ee3U
 
 GET {{baseURL}}/health
 
@@ -25,5 +26,25 @@ Content-Type: application/json
 ###
 
 GET {{baseURL}}/auth/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJheXVzaEAxMjM0LmNvbSIsImlkIjoxLCJyb2xlIjoiRU1QTE9ZRUUiLCJleHAiOjE3ODQwMTU4NTd9.McpK6GfEx2qnfjZK2IhwOCwR-rYfwKJIEnJMc8LZVxM
+Authorization: Bearer {{access_token}}
+
 ###
+
+GET {{baseURL}}/employees/
+Authorization: Bearer {{access_token}}
+
+###
+
+GET {{baseURL}}/employees/1
+Authorization: Bearer {{access_token}}
+
+###
+
+POST {{baseURL}}/employees
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+    "age": 26,
+    "designation": "SDE Intern"
+}
