@@ -44,3 +44,25 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         )
 
     return user
+
+
+def require_roles(*roles: str):
+    """Reusable RBAC dependency.
+
+    Usage:
+        @router.post(..., dependencies=[Depends(require_roles("ADMIN"))])
+        or
+        def endpoint(..., _: User = Depends(require_roles("ADMIN"))): ...
+    """
+
+    role_set = set(r.upper() for r in roles)
+
+    def _require_roles(current_user=Depends(get_current_user)):
+        if current_user.role is None or current_user.role.upper() not in role_set:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not enough permissions",
+            )
+        return current_user
+
+    return _require_roles
