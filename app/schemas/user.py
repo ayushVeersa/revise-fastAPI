@@ -1,7 +1,7 @@
 from datetime import datetime
-
 from pydantic import BaseModel, ConfigDict, EmailStr
 
+from app.core.role import Role
 
 class UserBase(BaseModel):
     name: str
@@ -14,7 +14,7 @@ class UserCreate(UserBase):
 
 class UserResponse(UserBase):
     id: int
-    role: str
+    role: Role
     is_active: bool
     created_at: datetime
     updated_at: datetime

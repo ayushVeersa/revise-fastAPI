@@ -2,12 +2,15 @@ from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.core.security import get_current_user, require_roles
+from app.core.security import get_current_user
+from app.core.permissions import require_roles
+from app.core.role import Role
 from app.models.user import User
 from app.schemas.employee import (
     EmployeeCreate,
     EmployeeUpdate,
     EmployeeResponse,
+    EmployeeRegistrationRequest,
 )
 from app.services.employee import (
     get_employee,
@@ -25,7 +28,7 @@ router = APIRouter(
 @router.get(
     "",
     response_model=list[EmployeeResponse],
-    dependencies=[Depends(require_roles("ADMIN", "MANAGER"))],
+    dependencies=[Depends(require_roles(Role.ADMIN, Role.MANAGER))],
 )
 def get_all_employees(
     skip: int = Query(default=0, ge=0),
@@ -49,20 +52,21 @@ def get_employee_by_id(
     "",
     response_model=EmployeeResponse,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(require_roles("ADMIN"))],
+    dependencies=[Depends(require_roles(Role.ADMIN))],
 )
 def create_new_employee(
-    employee: EmployeeCreate,
+    payload: EmployeeRegistrationRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return create_employee(db, employee)
+    # Create User first, then Employee profile
+    return create_employee(db, payload)
 
 
 @router.put(
     "{employee_id}",
     response_model=EmployeeResponse,
-    dependencies=[Depends(require_roles("ADMIN", "MANAGER"))],
+    dependencies=[Depends(require_roles(Role.ADMIN, Role.MANAGER))],
 )
 def update_existing_employee(
     employee_id: int,
@@ -80,7 +84,7 @@ def update_existing_employee(
 
 @router.delete(
     "{employee_id}",
-    dependencies=[Depends(require_roles("ADMIN"))],
+    dependencies=[Depends(require_roles(Role.ADMIN))],
 )
 def delete_existing_employee(
     employee_id: int,

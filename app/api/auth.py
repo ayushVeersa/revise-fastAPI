@@ -8,6 +8,8 @@ from app.services.jwt import create_access_token
 from app.schemas.user import UserResponse, UserCreate
 from app.schemas.auth import LoginRequest
 from app.core.security import get_current_user
+from app.core.permissions import require_roles
+from app.core.role import Role
 
 
 router = APIRouter(
@@ -15,9 +17,9 @@ router = APIRouter(
     tags=['Authentication']
 )
 
-@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-def register(user: UserCreate, db: Session = Depends(get_db)):
-    return create_user(db, user)
+# @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+# def register(user: UserCreate, db: Session = Depends(get_db)):
+#     return create_user(db, user)
 
 
 @router.post("/login")
@@ -47,3 +49,12 @@ def me(
     current_user: User = Depends(get_current_user),
 ):
     return current_user
+
+#test endpoint
+@router.get("/admin")
+def admin_test(
+    current_user: User = Depends(
+        require_roles(Role.ADMIN)
+    ),
+):
+    return {"message": "Welcome Admin"}
