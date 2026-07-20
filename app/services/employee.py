@@ -2,7 +2,13 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
 from app.models.employee import Employee
-from app.schemas.employee import EmployeeCreate, EmployeeUpdate
+from app.models.user import User
+from app.schemas.employee import (
+    EmployeeUpdate,
+    EmployeeRegistrationRequest,
+)
+from app.schemas.user import UserCreate
+from app.services.user_service import create_user
 
 
 def get_employee(db: Session, employee_id: int) -> Employee:
@@ -16,7 +22,7 @@ def get_employee(db: Session, employee_id: int) -> Employee:
     if not employee:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Employee not found"
+            detail="Employee not found",
         )
 
     return employee
@@ -26,47 +32,72 @@ def get_employees(db: Session, skip: int = 0, limit: int = 10):
 
     return (
         db.query(Employee)
-        .filter(Employee.is_active == True)
+        .filter(Employee.is_active.is_(True))
         .offset(skip)
         .limit(limit)
         .all()
     )
 
 
-def create_employee(db: Session, employee: EmployeeCreate) -> Employee:
+def create_employee(
+    db: Session,
+    payload: EmployeeRegistrationRequest,
+) -> Employee:
 
-    existing = (
-        db.query(Employee)
-        .filter(Employee.user_id == employee.user_id)
+
+    # Find/create the backing User
+    existing_user = (
+        db.query(User)
+        .filter(User.email == payload.email)
         .first()
     )
 
-    if existing:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Employee already exists for this user"
+    if existing_user is None:
+        user = create_user(
+            db,
+            UserCreate(
+                name=payload.name,
+                email=payload.email,
+                password=payload.password,
+            ),
         )
 
-    db_employee = Employee(
-        user_id=employee.user_id,
-        age=employee.age,
-        designation=employee.designation,
+    employee = (
+        db.query(Employee)
+        .filter(Employee.user_id == user.id)
+        .first()
     )
 
-    db.add(db_employee)
+    if employee:
+        employee.age = payload.age or employee.age or 0
+        employee.designation = payload.designation
+        employee.is_active = True
+        db.commit()
+        db.refresh(employee)
+        return employee
+
+    employee = Employee(
+        user_id=user.id,
+        age=payload.age or 0,
+        designation=payload.designation,
+    )
+
+    db.add(employee)
     db.commit()
-    db.refresh(db_employee)
+    db.refresh(employee)
 
-    return db_employee
+    return employee
 
 
 
-def update_employee(db: Session, employee_id: int, employee_update: EmployeeUpdate) -> Employee:
+def update_employee(
+    db: Session,
+    employee_id: int,
+    employee_update: EmployeeUpdate,
+) -> Employee:
 
     employee = get_employee(db, employee_id)
 
-    # employee.age = employee_update.age
-    # employee.designation = employee_update.designation
     update_data = employee_update.model_dump(exclude_unset=True)
 
     for key, value in update_data.items():
