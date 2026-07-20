@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 from app.models.user import User
 from app.schemas.user import UserCreate, UserResponse
@@ -20,7 +20,7 @@ def create_user(db: Session, user: UserCreate) -> User | Error:
     existing = get_user_by_email(db, user.email)
     if existing:
         raise HTTPException(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered"
         )
     
@@ -50,20 +50,20 @@ def authenticate_user(db: Session, email: str, password: str):
     user = get_user_by_email(db, email)
     if not user:
         raise HTTPException(
-            status_code=404,
-            detail="User not found"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Email or Passowrd."
         )
     
     if not verify_password(user.password_hash, password):
         raise HTTPException(
-            status_code=400,
-            detail="Wrong Password."
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password."
         )
     
     if not user.is_active:
         raise HTTPException(
-            status_code=400,
-            detail="Inactive user."
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password."
         )
     
     return user
