@@ -1,10 +1,10 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from enum import Enum
 
-class Environment(int, Enum):
-    dev = 1
-    test = 2
-    prod = 3
+class Environment(str, Enum):
+    DEV = "DEV"
+    TEST = "TEST"
+    PROD = "PROD"
 
 class Settings(BaseSettings):
     app_name: str = "EMS system"
@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     db_url: str
     jwt_secret: str
     jwt_expiry: int
-    environment: Environment = Environment.dev
+    environment: Environment = Environment.DEV
 
     model_config = SettingsConfigDict(env_file=".env")
 
