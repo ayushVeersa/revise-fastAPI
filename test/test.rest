@@ -1,7 +1,7 @@
 
 @baseURL = http://127.0.0.1:8000
-@access_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJheXVzaEAxMjM0LmNvbSIsImV4cCI6MTc4NDAyNzY5OX0.YZ4q4cStCdwLiDWT5HxF1hDNHfXxHsgahg3wL1_Ee3U
-
+@access_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJheXVzaEAxMjM0LmNvbSIsImV4cCI6MTc4NDU1MDM0MH0.JPhs0fSjR_xULyFBKfExx_qDzW14_xj-9LkssDkYzYA
+@employeeAccessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzaGl2YW1AZ29vZ2xlLmNvbSIsImV4cCI6MTc4NDU1NDE1NH0.ueyP08djoi5mVvJ2JH6AgavjGe6vrxnWW4XYFEeuXfw
 GET {{baseURL}}/health
 
 ###
@@ -19,17 +19,21 @@ POST {{baseURL}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "ayush@1234.com",
+    "email": "shivam@google.com",
     "password": "1234"
 }
 
 ###
 
 GET {{baseURL}}/auth/me
-Authorization: Bearer {{access_token}}
+Authorization: Bearer {{employeeAccessToken}}
 
 ###
 
+GET {{baseURL}}/auth/admin
+Authorization: Bearer {{access_token}}
+
+###
 GET {{baseURL}}/employees/
 Authorization: Bearer {{access_token}}
 
@@ -45,6 +49,16 @@ Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
 {
-    "age": 26,
-    "designation": "SDE Intern"
+    "name": "just Rai",
+    "email": "rai@google.com",
+    "password": "1234",
+    "designation": "SDE Intern",
+    "age": 24,
+    "department_id": 2,
+    "role": "EMPLOYEE"
 }
+
+#shivam@google.com --- 1234
+#shivam2@google.com --- 1234
+
+###
