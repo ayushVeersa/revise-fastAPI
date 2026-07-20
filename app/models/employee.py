@@ -1,4 +1,4 @@
-from sqlalchemy import (Column, Integer, String, Boolean, ForeignKey)
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, func
 from sqlalchemy.orm import relationship
 
 from app.db.database import Base
@@ -31,4 +31,15 @@ class Employee(Base):
     user = relationship(
         "User",
         back_populates="employee",
+    )
+
+    created_at = Column(
+        DateTime(timezone=True), 
+        server_default=func.now()
+    )
+
+    updated_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now()
     )
